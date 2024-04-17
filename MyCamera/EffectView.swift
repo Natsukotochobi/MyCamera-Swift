@@ -28,9 +28,33 @@ struct EffectView: View {
             }
             
             Spacer()
-            //エフェクトボタン
+            //「エフェクト」ボタン
             Button {
-                //なんかアクション書く
+                //アクション１
+                let filterName = "CIPhotoEffectMono"
+                let rotate = captureImage.imageOrientation
+                let inputImage = CIImage(image: captureImage)
+                
+                //アクション２
+                guard let effectFilter = CIFilter(name: filterName) else {
+                    return
+                }
+                effectFilter.setDefaults()
+                effectFilter.setValue(inputImage, forKey: kCIInputImageKey)
+                guard let outputImage = effectFilter.outputImage else {
+                    return
+                }
+                
+                //アクション３
+                let ciContext = CIContext(options: nil)
+                guard let cgImage = ciContext.createCGImage(outputImage, from: outputImage.extent) else {
+                    return
+                }
+                showImage = UIImage(
+                cgImage: cgImage,
+                scale: 1.0,
+                orientation: rotate
+                )
             } label: {
                 Text("エフェクト")
                     .frame(maxWidth: .infinity)
@@ -57,7 +81,7 @@ struct EffectView: View {
             
             //閉じるボタン
             Button {
-                //アクションを書く
+                isShowSheet.toggle()
             } label: {
                 Text("閉じる")
                     .frame(maxWidth: .infinity)
