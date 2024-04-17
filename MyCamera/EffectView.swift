@@ -67,16 +67,18 @@ struct EffectView: View {
             
             //シェアボタン
             if let showImage {
-                let shareImage = Image(uiImage: showImage)
-                ShareLink(item: shareImage, subject: nil, message: nil,
-                          preview: SharePreview("Photo", image: shareImage)) {
-                    Text("シェア")
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 50)
-                        .background(Color.blue)
-                        .foregroundColor(Color.white)
+                if let resizedImage = showImage.resized() {
+                    let shareImage = Image(uiImage: resizedImage)
+                    ShareLink(item: shareImage, subject: nil, message: nil,
+                              preview: SharePreview("Photo", image: shareImage)) {
+                        Text("シェア")
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 50)
+                            .background(Color.blue)
+                            .foregroundColor(Color.white)
+                    }
+                              .padding()
                 }
-                          .padding()
             }
             
             //閉じるボタン
