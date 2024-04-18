@@ -20,20 +20,12 @@ struct ContentView: View {
         VStack {
             
             Spacer()
-            
-            if let captureImage {
-                //撮影した写真を表示
-                Image(uiImage: captureImage)
-                    .resizable()
-                    .scaledToFit()
-            }
-            
-            
-            Spacer()
             //「カメラを起動する」ボタン
             Button(action: {
                 if UIImagePickerController.isSourceTypeAvailable(.camera) {
                     print("カメラ利用可")
+                    //撮影写真を初期化する
+                    captureImage = nil
                     isShowSheet.toggle()
                 } else {
                     print("カメラ利用不可")
@@ -48,7 +40,12 @@ struct ContentView: View {
             })
             .padding()
             .sheet(isPresented: $isShowSheet) {
-                ImagePickerView(isShowSheet: $isShowSheet, captureImage: $captureImage)
+                if let captureImage {
+                    //　撮影した写真がある場合はEffectViewを表示
+                    EffectView(isShowSheet: $isShowSheet, captureImage: captureImage)
+                } else {
+                    ImagePickerView(isShowSheet: $isShowSheet, captureImage: $captureImage)
+                }
             }
             
             
@@ -67,6 +64,8 @@ struct ContentView: View {
                         switch result {
                         case .success(let data):
                             if let data {
+                                // 撮影写真を初期化する
+                                captureImage = nil
                                 captureImage = UIImage(data: data)
                             }
                         case .failure:
@@ -74,25 +73,16 @@ struct ContentView: View {
                         }
                     }
                 }
-            }
-            
-            
-            
-            if let captureImage {
-                let shareImage = Image(uiImage: captureImage)
-                ShareLink(item: shareImage, subject: nil, message: nil,
-                          preview: SharePreview("Photo", image: shareImage)) {
-                    Text("SNSに投稿する")
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 50)
-                        .background(Color.blue)
-                        .foregroundColor(Color.white)
-                        .padding()
-                }
+            } // onChange
+        } //VStack
+        // 撮影した写真を保持する状態変数が変化したら実行する
+        .onChange(of: captureImage) {
+            if let _ = captureImage {
+                isShowSheet.toggle()
             }
         }
-    }
-}
+    } //Body
+} //View
 
 #Preview {
     ContentView()
